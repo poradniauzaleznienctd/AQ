@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kwestionariusz AQ</title>
+  <style>
+    :root {
+      --border:#000;
+      --page-max: 1080px;
+    }
+    body {
+      margin: 0;
+      padding: 18px 10px 32px;
+      font-family: "Times New Roman", Times, serif;
+      color:#000;
+      background:#fff;
+    }
+    .page {
+      max-width: var(--page-max);
+      margin: 0 auto;
+    }
+    h1 {
+      text-align:center;
+      font-size: 44px;
+      margin: 8px 0 22px;
+      font-weight: 700;
+    }
+    .meta {
+      display:flex;
+      gap: 18px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+    .field {
+      display:flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 280px;
+      flex: 1;
+    }
+    .field label {
+      white-space: nowrap;
+    }
+    .line-input {
+      flex: 1;
+      min-width: 160px;
+      border: none;
+      border-bottom: 1px dotted #000;
+      outline: none;
+      font-family: inherit;
+      font-size: 18px;
+      padding: 2px 4px;
+      background: transparent;
+    }
+    .sex-select {
+      border: none;
+      border-bottom: 1px dotted #000;
+      font-family: inherit;
+      font-size: 18px;
+      background: transparent;
+      padding: 2px 0;
+      outline:none;
+      min-width: 170px;
+    }
+    .instr {
+      font-size: 18px;
+      line-height: 1.35;
+      margin: 18px 0 10px;
+      text-align: justify;
+    }
+    .center-bold {
+      text-align:center;
+      font-size: 18px;
+      margin: 22px 0 22px;
+      letter-spacing: .3px;
+    }
+    .examples-title {
+      font-style: italic;
+      font-size: 20px;
+      margin: 10px 0 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin: 0 0 18px 0;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      vertical-align: middle;
+      padding: 6px 6px;
+      font-size: 16px;
+    }
+    th {
+      text-align: center;
+      font-weight: 700;
+    }
+    .stmt {
+      width: 34%;
+      font-size: 18px;
+      padding: 8px 10px;
+    }
+    .stmt .n {
+      display:inline-block;
+      width: 28px;
+    }
+    .stmt .t {
+      display:inline;
+    }
+    .opt {
+      width: 16.5%;
+      text-align:center;
+    }
+    .txt {
+      display:inline-block;
+      line-height: 1.15;
+    }
+
+    /* Klikalne odpowiedzi jak "zakreślenie" w PDF */
+    td.opt label {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height: 42px;
+      cursor: pointer;
+      user-select: none;
+    }
+    td.opt input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+    td.opt input[type="radio"]:focus + .txt {
+      outline: 2px solid #000;
+      outline-offset: 2px;
+    }
+    td.opt input[type="radio"]:checked + .txt {
+      border: 2px solid #000;
+      border-radius: 999px;
+      padding: 2px 10px;
+    }
+
+    /* Tabela przykładów */
+    table.examples th {
+      background: #e9e9e9;
+    }
+    table.examples td.opt.ex {
+      color: #444;
+    }
+    table.examples td.opt.ex.circ .txt {
+      border: 2px solid #000;
+      border-radius: 999px;
+      padding: 2px 10px;
+      color:#000;
+      background: transparent;
+    }
+
+    .actions {
+      display:flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 14px 0 10px;
+    }
+    button {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      padding: 10px 16px;
+      border: 1px solid #000;
+      background: #fff;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #f4f4f4;
+    }
+    .result {
+      margin-top: 16px;
+      border: 1px solid #000;
+      padding: 14px 14px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .result h2 {
+      margin: 0 0 10px 0;
+      font-size: 18px;
+    }
+    .result .grid {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 14px;
+    }
+    .result .card {
+      border: 1px solid #000;
+      padding: 10px 10px;
+    }
+    .result .label {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .muted {
+      color:#333;
+      font-size: 13px;
+      line-height: 1.35;
+      margin-top: 10px;
+    }
+    .footnote {
+      margin-top: 18px;
+      font-size: 11px;
+      line-height: 1.25;
+      font-family: "Times New Roman", Times, serif;
+    }
+    .warn {
+      font-size: 13px;
+      margin-top: 10px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 920px){
+      th, td{ font-size: 14px; }
+      .stmt{ font-size: 16px; }
+      h1{ font-size: 34px; }
+    }
+    @media (max-width: 720px){
+      .stmt{ width: 46%; }
+      .opt{ width: 13.5%; }
+      td.opt label{ min-height: 46px; }
+      .result .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Kwestionariusz AQ</h1>
+
+    <div class="meta" aria-label="Pola nagłówka (opcjonalne)">
+      <div class="field">
+        <label for="name">Imię i nazwisko:</label>
+        <input id="name" class="line-input" type="text" autocomplete="name" aria-label="Imię i nazwisko (opcjonalnie)">
+      </div>
+      <div class="field" style="max-width:340px;">
+        <label for="sex">Płeć:</label>
+        <select id="sex" class="sex-select" aria-label="Płeć (opcjonalnie)">
+          <option value="" selected></option>
+          <option value="M">mężczyzna</option>
+          <option value="K">kobieta</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="dob">Data urodzenia:</label>
+        <input id="dob" class="line-input" type="text" aria-label="Data urodzenia (opcjonalnie)">
+      </div>
+      <div class="field" style="max-width:340px;">
+        <label for="today">Dzisiejsza data:</label>
+        <input id="today" class="line-input" type="text" aria-label="Dzisiejsza data (opcjonalnie)">
+      </div>
+    </div>
+
+    <p class="instr">
+      Poniżej znajduje się lista stwierdzeń. Proszę przeczytać każde stwierdzenie <u>bardzo dokładnie</u> i zaznaczyć,
+      w jakim stopniu zgadza się lub nie zgadza się Pan/Pani z tym stwierdzeniem, zakreślając właściwą
+      odpowiedź.
+    </p>
+
+    <div class="center-bold">PROSZĘ NIE POMINĄĆ ŻADNEGO STWIERDZENIA</div>
+
+    <div class="examples-title">Przykłady:</div>
+
+    <table class="examples" aria-label="Przykłady (nie są liczone do wyniku)">
+      <thead>
+        <tr>
+          <th style="width:34%;"></th>
+          <th>Zdecydowanie<br>się zgadzam</th>
+          <th>Raczej się<br>zgadzam</th>
+          <th>Raczej się nie<br>zgadzam</th>
+          <th>Zdecydowanie<br>się nie zgadzam</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="stmt"><span class="n">1.</span> <span class="t">Chętnie podejmuję ryzyko.</span></td><td class="opt ex"><span class="txt">Zdecydowanie się<br>zgadzam</span></td><td class="opt ex"><span class="txt">Raczej się<br>zgadzam</span></td><td class="opt ex circ"><span class="txt">Raczej się nie<br>zgadzam</span></td><td class="opt ex"><span class="txt">Zdecydowanie się<br>nie zgadzam</span></td></tr>
+<tr><td class="stmt"><span class="n">2.</span> <span class="t">Lubię grać w gry planszowe.</span></td><td class="opt ex"><span class="txt">Zdecydowanie się<br>zgadzam</span></td><td class="opt ex circ"><span class="txt">Raczej się<br>zgadzam</span></td><td class="opt ex"><span class="txt">Raczej się nie<br>zgadzam</span></td><td class="opt ex"><span class="txt">Zdecydowanie się<br>nie zgadzam</span></td></tr>
+<tr><td class="stmt"><span class="n">3.</span> <span class="t">Nauka gry na instrumentach muzycznych przychodzi mi łatwo.</span></td><td class="opt ex"><span class="txt">Zdecydowanie się<br>zgadzam</span></td><td class="opt ex"><span class="txt">Raczej się<br>zgadzam</span></td><td class="opt ex"><span class="txt">Raczej się nie<br>zgadzam</span></td><td class="opt ex circ"><span class="txt">Zdecydowanie się<br>nie zgadzam</span></td></tr>
+<tr><td class="stmt"><span class="n">4.</span> <span class="t">Fascynują mnie inne kultury.</span></td><td class="opt ex circ"><span class="txt">Zdecydowanie się<br>zgadzam</span></td><td class="opt ex"><span class="txt">Raczej się<br>zgadzam</span></td><td class="opt ex"><span class="txt">Raczej się nie<br>zgadzam</span></td><td class="opt ex"><span class="txt">Zdecydowanie się<br>nie zgadzam</span></td></tr>
+      </tbody>
+    </table>
+
+    <form id="aqForm">
+      <table class="aq" aria-label="Kwestionariusz AQ – 50 stwierdzeń">
+        <thead>
+          <tr>
+            <th style="width:34%;"></th>
+            <th>Zdecydowanie<br>się zgadzam</th>
+            <th>Raczej się<br>zgadzam</th>
+            <th>Raczej się nie<br>zgadzam</th>
+            <th>Zdecydowanie<br>się nie zgadzam</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="stmt"><span class="n">1.</span> <span class="t">Wolę robić coś razem z innymi niż samemu.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q1" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q1" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q1" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q1" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">2.</span> <span class="t">Wolę wykonywać czynności zawsze w ten sam sposób.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q2" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q2" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q2" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q2" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">3.</span> <span class="t">Gdy próbuję sobie coś wyobrazić, bez trudności potrafię stworzyć w umyśle tego obraz.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q3" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q3" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q3" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q3" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">4.</span> <span class="t">Często jestem czymś tak bardzo pochłonięty/a, że zapominam o innych sprawach.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q4" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q4" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q4" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q4" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">5.</span> <span class="t">Często zauważam nawet ciche dźwięki, których inni nie słyszą.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q5" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q5" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q5" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q5" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">6.</span> <span class="t">Zwykle zauważam numery tablic samochodów lub podobne ciągi informacji.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q6" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q6" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q6" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q6" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">7.</span> <span class="t">Inni ludzie często mówią mi, że to, co powiedziałem/am było niegrzeczne, chociaż ja tego nie dostrzegam.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q7" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q7" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q7" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q7" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">8.</span> <span class="t">Kiedy czytam jakąś historię, mogę z łatwością wyobrazić sobie jej bohaterów</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q8" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q8" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q8" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q8" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">9.</span> <span class="t">Fascynują mnie daty.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q9" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q9" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q9" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q9" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">10.</span> <span class="t">Będąc w grupie, potrafię z łatwością śledzić rozmowy kilku osób równocześnie.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q10" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q10" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q10" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q10" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">11.</span> <span class="t">Dobrze się czuję, będąc z innymi ludźmi.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q11" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q11" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q11" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q11" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">12.</span> <span class="t">Mam tendencję do dostrzegania szczegółów, których inni nie widzą.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q12" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q12" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q12" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q12" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">13.</span> <span class="t">Wolę raczej pójść do biblioteki niż na zabawę.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q13" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q13" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q13" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q13" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">14.</span> <span class="t">Z łatwością wymyślam rozmaite historie.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q14" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q14" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q14" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q14" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">15.</span> <span class="t">Bardziej pociągają mnie ludzie niż rzeczy.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q15" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q15" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q15" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q15" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">16.</span> <span class="t">Mam wyraźnie określone zainteresowania i złości mnie, kiedy nie mogę ich realizować.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q16" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q16" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q16" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q16" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">17.</span> <span class="t">Lubię towarzyskie pogaduszki.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q17" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q17" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q17" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q17" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">18.</span> <span class="t">Kiedy coś mówię, innym ludziom nie zawsze łatwo jest coś wtrącić.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q18" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q18" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q18" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q18" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">19.</span> <span class="t">Fascynują mnie liczby.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q19" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q19" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q19" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q19" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">20.</span> <span class="t">Kiedy czytam jakąś opowieść, trudno mi odgadnąć intencje jej bohaterów.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q20" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q20" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q20" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q20" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">21.</span> <span class="t">Czytanie beletrystyki nie sprawia mi szczególnej przyjemności.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q21" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q21" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q21" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q21" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">22.</span> <span class="t">Nawiązywanie nowych przyjaźni sprawia mi trudność.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q22" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q22" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q22" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q22" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">23.</span> <span class="t">Nieustannie zauważam, że różne rzeczy układają się według powtarzających się schematów, wzorów.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q23" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q23" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q23" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q23" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">24.</span> <span class="t">Wolałbym/ałabym raczej pójść do teatru niż do muzeum.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q24" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q24" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q24" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q24" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">25.</span> <span class="t">Nie denerwuje mnie, gdy mój codzienny rozkład zajęć zostaje zakłócony.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q25" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q25" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q25" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q25" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">26.</span> <span class="t">Często zauważam, że nie wiem, jak podtrzymać rozmowę.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q26" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q26" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q26" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q26" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">27.</span> <span class="t">Z łatwością odczytuję treści zawarte między wierszami, gdy ktoś do mnie mówi.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q27" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q27" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q27" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q27" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">28.</span> <span class="t">Zwykle koncentruję się bardziej na całym obrazie niż na drobnych szczegółach.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q28" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q28" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q28" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q28" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">29.</span> <span class="t">Nie jestem zbyt dobry/a w zapamiętywaniu numerów telefonów.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q29" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q29" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q29" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q29" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">30.</span> <span class="t">Zwykle nie zauważam drobnych zmian w jakiejś sytuacji lub w czyimś wyglądzie.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q30" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q30" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q30" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q30" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">31.</span> <span class="t">Potrafię zauważyć, że osoba, która mnie słucha staje się znudzona.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q31" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q31" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q31" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q31" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">32.</span> <span class="t">Potrafię robić kilka rzeczy równocześnie.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q32" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q32" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q32" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q32" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">33.</span> <span class="t">Gdy rozmawiam przez telefon, nie jestem pewny/a, kiedy nadchodzi moja kolej, żeby mówić.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q33" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q33" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q33" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q33" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">34.</span> <span class="t">Lubię robić różne rzeczy spontanicznie.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q34" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q34" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q34" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q34" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">35.</span> <span class="t">Często jako ostatni/a rozumiem sens dowcipu.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q35" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q35" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q35" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q35" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">36.</span> <span class="t">Potrafię z łatwością odgadnąć, co ktoś myśli lub czuje, po prostu patrząc na jego twarz.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q36" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q36" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q36" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q36" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">37.</span> <span class="t">Potrafię bardzo szybko powrócić do czynności, którą coś mi przerwało.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q37" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q37" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q37" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q37" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">38.</span> <span class="t">Dobrze sobie radzę z towarzyskimi pogaduszkami.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q38" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q38" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q38" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q38" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">39.</span> <span class="t">Ludzie często zwracają mi uwagę, że nieustannie mówię na ten sam temat.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q39" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q39" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q39" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q39" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">40.</span> <span class="t">Kiedy byłem/am mały/a, przyjemność sprawiały mi zabawy z innymi dziećmi, w których trzeba było coś udawać.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q40" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q40" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q40" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q40" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">41.</span> <span class="t">Lubię zbierać informacje na temat kategorii, do których należą różne rzeczy (np. marek samochodów, gatunków ptaków, rodzajów pociągów, roślin i innych).</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q41" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q41" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q41" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q41" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">42.</span> <span class="t">Trudno jest mi wyobrazić sobie, jakby to było być kimś innym.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q42" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q42" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q42" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q42" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">43.</span> <span class="t">Lubię starannie planować wszelkie zajęcia, w jakich biorę udział.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q43" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q43" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q43" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q43" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">44.</span> <span class="t">Lubię spotkania towarzyskie.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q44" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q44" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q44" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q44" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">45.</span> <span class="t">Rozpoznawanie intencji innych ludzi sprawia mi trudność.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q45" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q45" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q45" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q45" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">46.</span> <span class="t">Nowe sytuacje wywołują we mnie niepokój.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q46" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q46" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q46" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q46" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">47.</span> <span class="t">Lubię poznawać nowych ludzi.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q47" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q47" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q47" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q47" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">48.</span> <span class="t">Jestem dobrym dyplomatą.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q48" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q48" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q48" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q48" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">49.</span> <span class="t">Nie jestem zbyt dobry/a w zapamiętywaniu dat urodzin innych osób.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q49" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q49" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q49" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q49" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+<tr><td class="stmt"><span class="n">50.</span> <span class="t">Z łatwością bawię się z dziećmi w zabawy wymagające udawania.</span></td><td class="opt">
+  <label>
+    <input type="radio" name="q50" value="SA" required>
+    <span class="txt">Zdecydowanie się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q50" value="A" required>
+    <span class="txt">Raczej się<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q50" value="D" required>
+    <span class="txt">Raczej się nie<br>zgadzam</span>
+  </label>
+</td><td class="opt">
+  <label>
+    <input type="radio" name="q50" value="SD" required>
+    <span class="txt">Zdecydowanie się<br>nie zgadzam</span>
+  </label>
+</td></tr>
+        </tbody>
+      </table>
+
+      <div class="actions">
+        <button type="button" id="calcBtn">Oblicz wynik</button>
+        <button type="reset" id="resetBtn">Wyczyść</button>
+      </div>
+
+      <div id="result" class="result" style="display:none;">
+        <h2>Wynik</h2>
+        <div class="grid">
+          <div class="card">
+            <div class="label">Wynik całkowity AQ (0–50)</div>
+            <div id="totalScore" style="font-size:26px; font-weight:700;"></div>
+            <div id="totalInterp" class="warn"></div>
+          </div>
+          <div class="card">
+            <div class="label">Podskale (0–10)</div>
+            <div id="subscales"></div>
+          </div>
+        </div>
+
+        <div class="muted">
+          <div><strong>AQ Scoring & Interpretation:</strong> Wynik całkowity AQ jest prezentowany jako wynik ogólny oraz wyniki w pięciu podskalach. Wyższe wyniki wskazują na wyższy poziom cech autystycznych.</div>
+          <div style="margin-top:6px;">
+            <strong>Progi dla wyniku całkowitego (zgodnie z załączonymi zrzutami ekranu):</strong><br>
+            • Mężczyźni: 26 i więcej = „Consistent with Autism”; 37 i więcej = „Pronounced”.<br>
+            • Kobiety: 27 i więcej = „Consistent with Autism”; 39 i więcej = „Pronounced”.<br>
+            • Łącznie (mężczyźni i kobiety): 26 i więcej = „Consistent with Autism”; 36 i więcej = „Pronounced”.
+          </div>
+          <div class="warn">
+            Uwaga: Kwestionariusz ma charakter przesiewowy i nie stanowi samodzielnej diagnozy.
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <div class="footnote">S. Baron-Cohen, S. Wheelwright, R. Skinner, J. Martin & E. Clubley (1993-2001). <strong>The Autism-Spectrum Quotient (AQ)</strong>, Autism Research Centre, University of Cambridge, UK; (J Autism Dev Disord, 2001, 31: 5-17); (<strong>Wersja polska:</strong> E. Pisula (2010), Uniwersytet Warszawski, Wydział Psychologii, Email: <u>ewa.pisula@psych.uw.edu.pl</u>; A. Rynkiewicz, I. Łucka (2010), Gdański Uniwersytet Medyczny, Klinika Psychiatrii Rozwojowej, Zaburzeń Psychotycznych i Wieku Podeszłego, Oddział Dziecięco-Młodzieżowy, Email: <u>kpsych@gumed.edu.pl</u>)</div>
+  </div>
+
+<script>
+(function(){
+  const KEY = {"1": "disagree", "2": "agree", "3": "disagree", "4": "agree", "5": "agree", "6": "agree", "7": "agree", "8": "disagree", "9": "agree", "10": "disagree", "11": "disagree", "12": "agree", "13": "agree", "14": "disagree", "15": "disagree", "16": "agree", "17": "disagree", "18": "agree", "19": "agree", "20": "agree", "21": "agree", "22": "agree", "23": "agree", "24": "disagree", "25": "disagree", "26": "agree", "27": "disagree", "28": "disagree", "29": "disagree", "30": "disagree", "31": "disagree", "32": "disagree", "33": "agree", "34": "disagree", "35": "agree", "36": "disagree", "37": "disagree", "38": "disagree", "39": "agree", "40": "disagree", "41": "agree", "42": "agree", "43": "agree", "44": "disagree", "45": "agree", "46": "agree", "47": "disagree", "48": "disagree", "49": "disagree", "50": "disagree"};
+  const SUBSCALES = {"Social Skill": [1, 11, 13, 15, 22, 36, 44, 45, 47, 48], "Attention Switching": [2, 4, 10, 16, 25, 32, 34, 37, 43, 46], "Attention to Detail": [5, 6, 9, 12, 19, 23, 28, 29, 30, 49], "Communication": [7, 17, 18, 26, 27, 31, 33, 35, 38, 39], "Imagination": [3, 8, 14, 20, 21, 24, 40, 41, 42, 50]};
+  const form = document.getElementById('aqForm');
+  const resultBox = document.getElementById('result');
+  const totalScoreEl = document.getElementById('totalScore');
+  const totalInterpEl = document.getElementById('totalInterp');
+  const subEl = document.getElementById('subscales');
+  const sexEl = document.getElementById('sex');
+
+  function sideFromValue(v){
+    return (v === 'SA' || v === 'A') ? 'agree' : 'disagree';
+  }
+
+  function scrollToFirstMissing(){
+    // find first question without checked radio
+    for(let i=1;i<=50;i++) {
+      const checked = form.querySelector('input[name="q'+i+'"]:checked');
+      if(!checked) {
+        const row = form.querySelector('input[name="q'+i+'"]')?.closest('tr');
+        if(row) {
+          row.scrollIntoView({behavior:'smooth', block:'center'});
+          row.style.outline = '3px solid #000';
+          setTimeout(()=>row.style.outline='', 1800);
+        }
+        return;
+      }
+    }
+  }
+
+  function interpretTotal(total){
+    const sex = sexEl.value; // 'M', 'K' or ''
+    let consistent, pronounced, label;
+    if(sex === 'M') {
+      consistent = 26; pronounced = 37; label = 'mężczyźni';
+    } else if(sex === 'K') {
+      consistent = 27; pronounced = 39; label = 'kobiety';
+    } else {
+      consistent = 26; pronounced = 36; label = 'łącznie (mężczyźni i kobiety)';
+    }
+
+    let desc;
+    if(total >= pronounced) {
+      desc = '„Pronounced”';
+    } else if(total >= consistent) {
+      desc = '„Consistent with Autism”';
+    } else {
+      desc = 'poniżej progu „Consistent with Autism”';
+    }
+
+    return {desc, label, consistent, pronounced};
+  }
+
+  function renderSubscales(scores01){
+    const parts = [];
+    const order = ['Social Skill','Attention Switching','Attention to Detail','Communication','Imagination'];
+    for(const name of order) {
+      const items = SUBSCALES[name];
+      let s = 0;
+      for(const idx of items) s += (scores01[idx] || 0);
+      parts.push('<div style="margin:3px 0;"><strong>'+name+':</strong> '+s+'</div>');
+    }
+    subEl.innerHTML = parts.join('');
+  }
+
+  document.getElementById('calcBtn').addEventListener('click', function(){
+    // validate
+    const missing = form.querySelectorAll('input[type="radio"][required]');
+    // native validity check doesn't work well with radio groups here, so manual:
+    for(let i=1;i<=50;i++) {
+      if(!form.querySelector('input[name="q'+i+'"]:checked')) {
+        alert('Proszę odpowiedzieć na wszystkie 50 stwierdzeń (brakuje odpowiedzi przy pozycji '+i+').');
+        scrollToFirstMissing();
+        return;
+      }
+    }
+
+    const scores01 = {};
+    let total = 0;
+
+    for(let i=1;i<=50;i++) {
+      const sel = form.querySelector('input[name="q'+i+'"]:checked');
+      const side = sideFromValue(sel.value);
+      const point = (KEY[i] === side) ? 1 : 0;
+      scores01[i] = point;
+      total += point;
+    }
+
+    totalScoreEl.textContent = total;
+
+    const interp = interpretTotal(total);
+    totalInterpEl.innerHTML = 'Interpretacja (progi: '+interp.label+'): <strong>'+interp.desc+
+      '</strong> (Consistent: '+interp.consistent+'+, Pronounced: '+interp.pronounced+'+)';
+
+    renderSubscales(scores01);
+
+    resultBox.style.display = 'block';
+    resultBox.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    resultBox.style.display = 'none';
+    totalScoreEl.textContent = '';
+    totalInterpEl.textContent = '';
+    subEl.innerHTML = '';
+  });
+})();
+</script>
+</body>
+</html>
